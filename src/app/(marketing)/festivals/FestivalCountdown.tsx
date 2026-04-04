@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { festivals } from "@/data/festivals";
+import { Festival } from "@/types"; // Make sure you have this type
+// import { festivals } from "@/data/festivals"; // now passed as prop
 
-function nextFestivalDate() {
+interface FestivalCountdownProps {
+  festivals: Festival[];
+}
+
+function nextFestivalDate(festivals: Festival[]) {
   const now = new Date();
   const year = now.getFullYear();
   let best: { name: string; at: Date } | null = null;
@@ -16,12 +21,13 @@ function nextFestivalDate() {
   return best;
 }
 
-export function FestivalCountdown() {
+export function FestivalCountdown({ festivals }: FestivalCountdownProps) {
   const [left, setLeft] = useState<string>("");
 
   useEffect(() => {
-    const nf = nextFestivalDate();
+    const nf = nextFestivalDate(festivals);
     if (!nf) return;
+
     const tick = () => {
       const diff = nf.at.getTime() - Date.now();
       if (diff <= 0) {
@@ -32,14 +38,17 @@ export function FestivalCountdown() {
       const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
       setLeft(`${d}d ${h}h until ${nf.name}`);
     };
+
     tick();
     const id = setInterval(tick, 60_000);
     return () => clearInterval(id);
-  }, []);
+  }, [festivals]);
 
   return (
     <div className="mt-10 rounded-2xl border border-gold-primary/30 bg-gold-primary/10 px-6 py-4 text-center">
-      <p className="text-xs uppercase tracking-widest text-gold-primary/90">Next highlight</p>
+      <p className="text-xs uppercase tracking-widest text-gold-primary/90">
+        Next highlight
+      </p>
       <p className="mt-1 font-display text-2xl text-ivory">{left || "…"}</p>
     </div>
   );

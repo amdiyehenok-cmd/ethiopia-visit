@@ -1,11 +1,27 @@
-import { PrismaClient } from "@prisma/client";
+// src/lib/prisma.ts
+import pkg from '@prisma/client'
+const { PrismaClient } = pkg as { PrismaClient: new (...args: any[]) => any }
+import { PrismaNeon } from '@prisma/adapter-neon'
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('❌ DATABASE_URL environment variable is not set')
+}
+
+const adapter = new PrismaNeon({ connectionString })
+
+declare global {
+  // eslint-disable-next-line no-var
+  var prisma: InstanceType<typeof PrismaClient> | undefined
+}
 
 export const prisma =
-  globalForPrisma.prisma ??
+  global.prisma ??
   new PrismaClient({
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+    adapter,
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+  })
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') {
+  global.prisma = prisma
+}

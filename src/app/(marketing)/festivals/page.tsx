@@ -4,6 +4,7 @@ import Link from "next/link";
 import { festivals } from "@/data/festivals";
 import { ShimmerText } from "@/components/ui/ShimmerText";
 import { FestivalCountdown } from "./FestivalCountdown";
+import type { Festival } from "@/types"; // make sure this type exists
 
 export const metadata: Metadata = {
   title: "Ethiopian Festivals",
@@ -26,7 +27,8 @@ export default function FestivalsPage() {
           <p className="mx-auto mt-5 max-w-xl text-lg text-ivory/60">
             Ethiopia celebrates with fire, water, flowers, and music. Here are the dates you need to plan around.
           </p>
-          <FestivalCountdown festivals={festivals} />
+          {/* Fixed: pass festivals prop */}
+          <FestivalCountdown festivals={festivals as Festival[]} />
         </div>
       </div>
 
@@ -41,7 +43,6 @@ export default function FestivalsPage() {
                   alt={f.name}
                   fill
                   className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="(max-width:1024px) 100vw, 50vw"
                   sizes="(max-width:1024px) 100vw, 50vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />

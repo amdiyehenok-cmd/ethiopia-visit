@@ -57,17 +57,27 @@ export function VRToursSection() {
             className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-xl"
           >
             <div className="relative aspect-[4/3]">
-              <Image
-                src={tour.panoramaUrl}
-                alt=""
-                fill
-                className="object-cover blur-sm transition duration-700 group-hover:scale-105 group-hover:blur-none"
-                sizes="(max-width:768px) 100vw, 33vw"
-              />
+              {/* FIXED: Prevent null panoramaUrl error */}
+              {tour.panoramaUrl ? (
+                <Image
+                  src={tour.panoramaUrl}
+                  alt={tour.title}
+                  fill
+                  className="object-cover blur-sm transition duration-700 group-hover:scale-105 group-hover:blur-none"
+                  sizes="(max-width:768px) 100vw, 33vw"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center bg-zinc-900 text-ivory/30 text-sm">
+                  No image available
+                </div>
+              )}
+
               <div className="absolute right-3 top-3 rounded-full border border-gold-primary/40 bg-black/50 px-2 py-1 text-xs font-semibold text-gold-light backdrop-blur-md">
                 <span className="inline-block animate-pulse">360°</span>
               </div>
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <Badge className="mb-2 capitalize">{tour.category}</Badge>
                 <h3 className="font-display text-2xl text-ivory">{tour.title}</h3>
