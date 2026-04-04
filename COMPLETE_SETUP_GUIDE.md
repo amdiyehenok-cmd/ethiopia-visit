@@ -61,7 +61,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your-publishable-key
 STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
 
 # Chapa (Ethiopia ETB): https://dashboard.chapa.co
-CHAPA_SECRET_KEY=CHASECK_TEST-your-test-key
+CHAPA_SECRET_KEY=CHASECK_TEST-WoD4LbwXIqPCnmw2Umg8r2peA6vGxzz3
 
 # ── WEATHER ──────────────────────────────────────────────────
 # https://home.openweathermap.org/api_keys (free, activates in 2hrs)
@@ -454,10 +454,10 @@ cd ethiopia-final
 # Initialize git (if not done)
 git init
 git add .
-git commit -m "feat: Ethiopia Visit production ready"
+git commit -m "feat: Ethiopia Visit"
 
 # Create repo on github.com first, then:
-git remote add origin https://github.com/YOUR_USERNAME/ethiopia-visit.git
+git remote add origin https://github.com/amdiyehenok-cmd/ethiopia-visit.git
 git push -u origin main
 ```
 
