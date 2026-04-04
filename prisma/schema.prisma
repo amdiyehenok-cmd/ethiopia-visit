@@ -1,0 +1,364 @@
+// ============================================================
+//  ETHIOPIA VISIT — Prisma Schema
+//  Database: Neon PostgreSQL (serverless)
+//  Run after setting DATABASE_URL in .env.local:
+//    npx prisma generate
+//    npx prisma db push
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+ datasource db {
+  provider = "postgresql"
+}
+
+// ── Users ─────────────────────────────────────────────────
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  phone         String?
+  country       String?
+  role          UserRole  @default(TOURIST)
+  emailVerified DateTime?
+
+  // Relations
+  trips         Trip[]
+  reviews       Review[]
+  guide         Guide?
+  photos        Photo[]
+  stories       TravelStory[]
+  bookings      Booking[]
+  communityPosts CommunityPost[]
+  postLikes     PostLike[]
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  TOURIST
+  GUIDE
+  ADMIN
+}
+
+// ── Guides ────────────────────────────────────────────────
+model Guide {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Profile
+  name            String
+  email           String
+  phone           String?
+  whatsapp        String?
+  bio             String    @db.Text
+  city            String
+  region          String?
+  latitude        Float     @default(9.145)
+  longitude       Float     @default(40.489)
+  profilePhoto    String?
+  coverPhoto      String?
+
+  // Professional
+  languages       String[]
+  specialties     String[]
+  yearsExperience Int       @default(1)
+  hasCertificate  Boolean   @default(false)
+  hasInsurance    Boolean   @default(false)
+  licenseNumber   String?
+
+  // Platform
+  verified        Boolean   @default(false)   // set true by admin after review
+  active          Boolean   @default(true)
+  featured        Boolean   @default(false)
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+  responseTime    String    @default("Within 1 hour")
+  totalEarnings   Float     @default(0)
+
+  // Application status
+  status          GuideStatus @default(PENDING)
+  appliedAt       DateTime    @default(now())
+  approvedAt      DateTime?
+  rejectedReason  String?
+
+  // Relations
+  experiences     Experience[]
+  bookings        Booking[]
+  reviews         Review[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("guides")
+}
+
+enum GuideStatus {
+  PENDING    // just applied, awaiting review
+  APPROVED   // admin approved, live on platform
+  REJECTED   // not approved
+  SUSPENDED  // temporarily suspended
+}
+
+// ── Experiences (Guide offerings) ────────────────────────
+model Experience {
+  id              String    @id @default(cuid())
+  guideId         String
+  guide           Guide     @relation(fields: [guideId], references: [id], onDelete: Cascade)
+
+  title           String
+  description     String    @db.Text
+  category        String    // History, Culture, Adventure, Food, Wildlife, Photography
+  durationHours   Int
+  maxGroupSize    Int       @default(8)
+  pricePerPerson  Float
+  currency        String    @default("USD")
+  includes        String[]  // ["Transport", "Lunch", "Entry fees"]
+  excludes        String[]
+  images          String[]
+  city            String
+  meetingPoint    String?
+  languages       String[]
+  difficulty      String    @default("Easy")  // Easy, Moderate, Hard
+  bestMonths      String[]
+
+  active          Boolean   @default(true)
+  featured        Boolean   @default(false)
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+  totalBookings   Int       @default(0)
+
+  bookings        Booking[]
+  reviews         Review[]
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("experiences")
+}
+
+// ── Hotels (mirroring static data, for reviews) ──────────
+model Hotel {
+  id              String    @id @default(cuid())
+  externalId      String    @unique  // matches hotels.ts id
+  name            String
+  city            String
+  location        String
+  description     String    @db.Text
+  stars           Int
+  pricePerNight   Float
+  latitude        Float
+  longitude       Float
+  images          String[]
+  amenities       String[]
+  affiliateUrl    String
+  featured        Boolean   @default(false)
+
+  reviews         Review[]
+  bookings        Booking[]
+
+  createdAt       DateTime  @default(now())
+
+  @@map("hotels")
+}
+
+// ── Bookings (unified for guides and hotels) ─────────────
+model Booking {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+
+  type            BookingType   // GUIDE_EXPERIENCE | HOTEL
+  status          BookingStatus @default(PENDING)
+
+  // Guide booking fields
+  guideId         String?
+  guide           Guide?        @relation(fields: [guideId], references: [id])
+  experienceId    String?
+  experience      Experience?   @relation(fields: [experienceId], references: [id])
+  groupSize       Int           @default(1)
+  bookingDate     DateTime?
+
+  // Hotel booking fields
+  hotelId         String?
+  hotel           Hotel?        @relation(fields: [hotelId], references: [id])
+  checkIn         DateTime?
+  checkOut        DateTime?
+  nights          Int           @default(1)
+  guestCount      Int           @default(1)
+
+  // Payment
+  totalAmountUSD  Float
+  currency        String        @default("USD")
+  paymentProvider String?       // stripe | chapa | telebirr | paypal
+  paymentRef      String?       // transaction reference from provider
+  paidAt          DateTime?
+
+  // Guest info
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
+  specialRequests String?       @db.Text
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("bookings")
+}
+
+enum BookingType {
+  GUIDE_EXPERIENCE
+  HOTEL
+}
+
+enum BookingStatus {
+  PENDING      // payment not yet confirmed
+  CONFIRMED    // payment confirmed
+  COMPLETED    // experience/stay completed
+  CANCELLED    // cancelled by user or guide
+  REFUNDED
+}
+
+// ── Reviews ───────────────────────────────────────────────
+model Review {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  rating        Int       // 1-5
+  comment       String    @db.Text
+  type          String    // "hotel" | "guide" | "experience"
+
+  hotelId       String?
+  hotel         Hotel?      @relation(fields: [hotelId], references: [id])
+  guideId       String?
+  guide         Guide?      @relation(fields: [guideId], references: [id])
+  experienceId  String?
+  experience    Experience? @relation(fields: [experienceId], references: [id])
+
+  approved      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@map("reviews")
+}
+
+// ── Trips (AI-generated itineraries saved by users) ──────
+model Trip {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  summary     String?   @db.Text
+  itinerary   Json      // full PlannerResult JSON
+  duration    Int
+  budget      String    // budget | mid-range | luxury
+  interests   String[]
+  startDate   DateTime?
+  totalCost   Float?
+
+  createdAt   DateTime  @default(now())
+
+  @@map("trips")
+}
+
+// ── Community Posts ───────────────────────────────────────
+model CommunityPost {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  text      String    @db.Text
+  imageUrl  String?
+  location  String?
+  tag       String    @default("Tips")
+  likes     Int       @default(0)
+
+  replies   PostReply[]
+  postLikes PostLike[]
+
+  createdAt DateTime  @default(now())
+
+  @@map("community_posts")
+}
+
+model PostReply {
+  id        String        @id @default(cuid())
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorName String
+  text      String        @db.Text
+  likes     Int           @default(0)
+  createdAt DateTime      @default(now())
+
+  @@map("post_replies")
+}
+
+model PostLike {
+  id        String        @id @default(cuid())
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  createdAt DateTime      @default(now())
+
+  @@unique([postId, userId])
+  @@map("post_likes")
+}
+
+// ── Photos (Cloudinary uploads) ───────────────────────────
+model Photo {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  url           String
+  cloudinaryId  String
+  caption       String?
+  location      String?
+  destination   String?
+  tags          String[]
+  likes         Int       @default(0)
+  approved      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@map("photos")
+}
+
+// ── Travel Stories ─────────────────────────────────────────
+model TravelStory {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  title         String
+  content       String    @db.Text
+  coverImage    String?
+  destinations  String[]
+  duration      Int
+  budget        Float?
+  rating        Float?
+  likes         Int       @default(0)
+  views         Int       @default(0)
+  published     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  @@map("travel_stories")
+}
+
+// ── Affiliate Click Tracking ──────────────────────────────
+model AffiliateClick {
+  id        String   @id @default(cuid())
+  hotelId   String
+  userId    String?
+  source    String
+  url       String
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@map("affiliate_clicks")
+}

@@ -1,0 +1,227 @@
+@import "tailwindcss";
+
+:root {
+  --gold-primary: #c9a84c;
+  --gold-light: #f5d083;
+  --gold-shine: #e8c96a;
+  --gold-dark: #b8972e;
+  --obsidian: #0a0a0b;
+  --dark-1: #111114;
+  --dark-2: #1a1a1f;
+  --dark-3: #242430;
+  --ethiopia-green: #1a6b3a;
+  --ethiopia-red: #bf1b2c;
+  --ivory: #f5f0e8;
+  --glass: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+@theme inline {
+  --color-background: var(--obsidian);
+  --color-foreground: var(--ivory);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cormorant), ui-serif, Georgia, serif;
+  --font-accent: var(--font-playfair), ui-serif, Georgia, serif;
+  --color-gold-primary: #c9a84c;
+  --color-gold-light: #f5d083;
+  --color-gold-shine: #e8c96a;
+  --color-gold-dark: #b8972e;
+  --color-obsidian: #0a0a0b;
+  --color-dark-1: #111114;
+  --color-dark-2: #1a1a1f;
+  --color-dark-3: #242430;
+  --color-ethiopia-green: #1a6b3a;
+  --color-ethiopia-red: #bf1b2c;
+  --color-ivory: #f5f0e8;
+}
+
+/* ── Base ─────────────────────────────── */
+body {
+  font-family: var(--font-jakarta), "Plus Jakarta Sans", sans-serif;
+  background-color: var(--obsidian);
+  color: var(--ivory);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-cormorant), "Cormorant Garamond", serif;
+}
+
+/* ── Scroll ────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--dark-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold-dark);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-primary);
+}
+
+/* ── Selection ──────────────────────────── */
+::selection {
+  background: rgba(201, 168, 76, 0.25);
+  color: var(--ivory);
+}
+
+/* ── Shimmer ────────────────────────────── */
+.shimmer-gold {
+  background: linear-gradient(
+    105deg,
+    var(--gold-dark) 20%,
+    var(--gold-light) 40%,
+    #fff8e7 50%,
+    var(--gold-light) 60%,
+    var(--gold-dark) 80%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+/* ── Grain overlay ──────────────────────── */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.3;
+  mix-blend-mode: overlay;
+}
+
+/* ── Glass card ─────────────────────────── */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+}
+
+/* ── Gold button ────────────────────────── */
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold-dark));
+  background-size: 200% auto;
+  color: var(--obsidian);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-gold:hover {
+  background-position: right center;
+  box-shadow: 0 8px 30px rgba(201, 168, 76, 0.45);
+  transform: translateY(-2px);
+}
+.btn-gold:active {
+  transform: translateY(0);
+}
+.btn-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Ethiopian flag border ──────────────── */
+.eth-border {
+  border-image: linear-gradient(90deg, var(--ethiopia-green), var(--gold-primary), var(--ethiopia-red)) 1;
+}
+
+/* Ethiopian flag stripe accent */
+.eth-stripe {
+  background: linear-gradient(
+    to right,
+    var(--ethiopia-green) 33.33%,
+    var(--gold-primary) 33.33% 66.66%,
+    var(--ethiopia-red) 66.66%
+  );
+  height: 3px;
+  width: 100%;
+}
+
+/* ── Particle dust (hero) ──────────────── */
+.dust-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dust-particles span {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(245, 208, 131, 0.35);
+  border-radius: 50%;
+  animation: float-dust 12s linear infinite;
+}
+.dust-particles span:nth-child(odd) {
+  animation-duration: 16s;
+  opacity: 0.5;
+}
+@keyframes float-dust {
+  0%   { transform: translateY(100vh) translateX(0); opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-20vh) translateX(20px); opacity: 0; }
+}
+
+/* ── Cursor glow (desktop) ─────────────── */
+@media (pointer: fine) {
+  .cursor-glow { cursor: none; }
+}
+
+/* ── Loading skeleton ───────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--dark-2) 25%, var(--dark-3) 50%, var(--dark-2) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Page transition ────────────────────── */
+.page-enter {
+  animation: page-in 0.4s ease forwards;
+}
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Image fallback background ──────────── */
+.img-fallback {
+  background: linear-gradient(135deg, var(--dark-2), var(--dark-3));
+}
+
+/* ── Focus visible (accessibility) ─────── */
+:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* ── Mobile tap highlight ───────────────── */
+* {
+  -webkit-tap-highlight-color: rgba(201, 168, 76, 0.15);
+}
