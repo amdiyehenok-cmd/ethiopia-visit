@@ -3,20 +3,7 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["fra1"],
-  "env": {
-    
-    "DATABASE_URL": "@database-url",
-    "NEXTAUTH_SECRET": "@nextauth-secret",
-    "STRIPE_SECRET_KEY": "@stripe-secret-key",
-    "CHAPA_SECRET_KEY": "@chapa-secret-key",
-    "TELEBIRR_APP_ID": "@telebirr-app-id",
-    "TELEBIRR_APP_KEY": "@telebirr-app-key",
-    "TELEBIRR_PUBLIC_KEY": "@telebirr-public-key",
-    "TELEBIRR_SHORT_CODE": "@telebirr-short-code",
-    "OPENWEATHER_API_KEY": "@openweather-api-key",
-    "CLOUDINARY_API_SECRET": "@cloudinary-api-secret",
-    "BOOKING_AFFILIATE_ID": "@booking-affiliate-id"
-  },
+  "env": {},
   "headers": [
     {
       "source": "/(.*)",
