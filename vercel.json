@@ -4,7 +4,7 @@
   "framework": "nextjs",
   "regions": ["fra1"],
   "env": {
-    "GEMINI_API_KEY": "@gemini-api-key",
+    
     "DATABASE_URL": "@database-url",
     "NEXTAUTH_SECRET": "@nextauth-secret",
     "STRIPE_SECRET_KEY": "@stripe-secret-key",
