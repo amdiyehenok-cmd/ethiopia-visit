@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
-const base = process.env.NEXTAUTH_URL ?? "https://ethiopia-visit.vercel.app";
+// Use a public environment variable for your site URL
+const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ethiopia-visit.vercel.app";
 
 export default function robots(): MetadataRoute.Robots {
   return {
