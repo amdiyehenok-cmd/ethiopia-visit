@@ -1,6 +1,5 @@
 // src/lib/prisma.ts
-import pkg from '@prisma/client'
-const { PrismaClient } = pkg as { PrismaClient: new (...args: any[]) => any }
+import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
 
 const connectionString = process.env.DATABASE_URL
@@ -12,7 +11,7 @@ const adapter = new PrismaNeon({ connectionString })
 
 declare global {
   // eslint-disable-next-line no-var
-  var prisma: InstanceType<typeof PrismaClient> | undefined
+  var prisma: PrismaClient | undefined
 }
 
 export const prisma =
